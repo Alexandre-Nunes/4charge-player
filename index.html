@@ -16,6 +16,12 @@ aside{width:240px;background:var(--dark);color:white;padding:25px 15px;flex-shri
 .section{font-size:10px;color:#8594ad;letter-spacing:1.5px;padding:10px}
 nav button{display:flex;gap:12px;width:100%;padding:13px 12px;border:0;border-radius:8px;background:none;color:#cbd5e5;text-align:left;cursor:pointer;margin-bottom:4px;font-size:13px}
 nav button:hover,nav button.active{background:#263958;color:white}
+nav .submenu{display:none;padding-left:12px;margin:0 0 7px}
+nav .submenu.open{display:block}
+nav .submenu button{font-size:12px;padding:10px 10px;margin-bottom:2px;color:#b9c7dc}
+nav .submenu button:before{content:"–";color:#8594ad}
+nav .menu-toggle .arrow{margin-left:auto;font-size:11px;transition:transform .15s}
+nav .menu-toggle[aria-expanded="true"] .arrow{transform:rotate(90deg)}
 main{flex:1;min-width:0}
 header{background:white;padding:20px 30px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
 header span{color:var(--muted);font-size:12px}
@@ -68,12 +74,33 @@ footer{text-align:center;color:#9aa4b5;font-size:10px;margin-top:25px}
   <div class="section">MENU PRINCIPAL</div>
   <nav>
     <button class="active" data-page="dashboard"><span>▦</span><span class="navtext">Dashboard</span></button>
-    <button data-page="parceiros"><span>♧</span><span class="navtext">Parceiros</span></button>
-    <button data-page="pontos"><span>⌖</span><span class="navtext">Pontos de anúncio</span></button>
-    <button data-page="anunciantes"><span>◎</span><span class="navtext">Anunciantes</span></button>
-    <button data-page="dispositivos"><span>▣</span><span class="navtext">Dispositivos</span></button>
-    <button data-page="midias"><span>▧</span><span class="navtext">Biblioteca de mídias</span></button>
-    <button data-page="grade"><span>☷</span><span class="navtext">Grade de anúncios</span></button>
+
+    <button class="menu-toggle" type="button" data-submenu="cadastros-menu" aria-expanded="false">
+      <span>▤</span><span class="navtext">Cadastros</span><span class="arrow">▶</span>
+    </button>
+    <div class="submenu" id="cadastros-menu">
+      <button type="button" data-page="parceiros"><span class="navtext">Parceiros</span></button>
+      <button type="button" data-page="pontos"><span class="navtext">Pontos de anúncio</span></button>
+      <button type="button" data-page="anunciantes"><span class="navtext">Anunciantes</span></button>
+      <button type="button" data-page="dispositivos"><span class="navtext">Dispositivos</span></button>
+      <button type="button" data-page="midias"><span class="navtext">Mídias</span></button>
+    </div>
+
+    <button type="button" data-page="grade"><span>☷</span><span class="navtext">Grades de anúncios</span></button>
+    <button type="button" data-page="relatorio"><span>▥</span><span class="navtext">Relatório</span></button>
+
+    <button class="menu-toggle" type="button" data-submenu="comercial-menu" aria-expanded="false">
+      <span>▣</span><span class="navtext">Comercial</span><span class="arrow">▶</span>
+    </button>
+    <div class="submenu" id="comercial-menu">
+      <button type="button" data-page="apresentacoes"><span class="navtext">Apresentações</span></button>
+      <button type="button" data-page="vendas"><span class="navtext">Vendas</span></button>
+      <button type="button" data-page="crm"><span class="navtext">CRM</span></button>
+      <button type="button" data-page="scripts"><span class="navtext">Scripts</span></button>
+    </div>
+
+    <button type="button" data-page="financeiro"><span>＄</span><span class="navtext">Financeiro</span></button>
+    <button type="button" data-page="agenda"><span>▦</span><span class="navtext">Agenda</span></button>
   </nav>
 </aside>
 <main>
@@ -150,9 +177,26 @@ footer{text-align:center;color:#9aa4b5;font-size:10px;margin-top:25px}
 </main>
 </div>
 <script>
-const names={dashboard:"Dashboard",parceiros:"Parceiros",pontos:"Pontos de anúncio",anunciantes:"Anunciantes",dispositivos:"Dispositivos",midias:"Biblioteca de mídias",grade:"Grade de anúncios"};
-function go(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));document.getElementById("crumb").textContent=names[id];}
-document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+const names={dashboard:"Dashboard",parceiros:"Parceiros",pontos:"Pontos de anúncio",anunciantes:"Anunciantes",dispositivos:"Dispositivos",midias:"Mídias",grade:"Grades de anúncios",relatorio:"Relatório",apresentacoes:"Apresentações",vendas:"Vendas",crm:"CRM",scripts:"Scripts",financeiro:"Financeiro",agenda:"Agenda"};
+function go(id){
+  const page=document.getElementById(id);
+  if(!page){
+    const label=names[id]||"Este módulo";
+    alert(label+" será implementado nas próximas etapas.");
+    return;
+  }
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  page.classList.add("active");
+  document.querySelectorAll('nav button[data-page]').forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+  document.getElementById("crumb").textContent=names[id]||id;
+}
+document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+document.querySelectorAll("nav .menu-toggle").forEach(b=>b.addEventListener("click",()=>{
+  const submenu=document.getElementById(b.dataset.submenu);
+  const opening=!submenu.classList.contains("open");
+  submenu.classList.toggle("open",opening);
+  b.setAttribute("aria-expanded",String(opening));
+}));
 document.getElementById("search").addEventListener("input",e=>{let q=e.target.value.toLowerCase();document.querySelectorAll("#screens .screen").forEach(s=>s.style.display=s.dataset.name.toLowerCase().includes(q)?"":"none")});
 function selectScreen(el){let box=document.getElementById("chosen");box.hidden=false;box.innerHTML="<strong>Tela selecionada:</strong> "+el.dataset.name+"<br><br>Na próxima etapa, vamos implementar aqui a lista de mídias compatíveis, a grade ativa, os controles para adicionar e remover anúncios, a ordenação e o botão Salvar.";}
 </script>
