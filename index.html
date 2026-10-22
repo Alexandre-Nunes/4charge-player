@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4Charge Player</title>
+<style>
+:root{--blue:#2855d9;--dark:#111c30;--bg:#f4f6fa;--line:#e6eaf1;--muted:#738096}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#192337}
+.layout{display:flex;min-height:100vh}
+aside{width:240px;background:var(--dark);color:white;padding:25px 15px;flex-shrink:0}
+.logo{font-size:22px;font-weight:800;padding:5px 10px 30px}
+.logo small{display:block;font-size:10px;letter-spacing:4px;color:#9db4e8;margin-top:5px}
+.section{font-size:10px;color:#8594ad;letter-spacing:1.5px;padding:10px}
+nav button{display:flex;gap:12px;width:100%;padding:13px 12px;border:0;border-radius:8px;background:none;color:#cbd5e5;text-align:left;cursor:pointer;margin-bottom:4px;font-size:13px}
+nav button:hover,nav button.active{background:#263958;color:white}
+main{flex:1;min-width:0}
+header{background:white;padding:20px 30px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+header span{color:var(--muted);font-size:12px}
+.avatar{background:#eaf0ff;color:var(--blue);border-radius:50%;padding:12px;font-weight:bold}
+.content{padding:30px;max-width:1400px;margin:auto}
+h1{font-size:28px;margin:0 0 8px}
+p.sub{color:var(--muted);font-size:14px;margin:0 0 25px}
+.eyebrow{color:var(--blue);font-size:10px;font-weight:bold;letter-spacing:2px;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.card,.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:20px}
+.card label{font-size:12px;color:var(--muted)}
+.number{font-size:29px;font-weight:bold;margin:15px 0 8px}
+.hint{font-size:11px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.panel h3{font-size:16px;margin:0 0 5px}
+.panel .desc{font-size:12px;color:var(--muted);margin-bottom:18px}
+.item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #edf0f5}
+.item:last-child{border:0}
+.symbol{width:40px;height:40px;display:grid;place-items:center;background:#eef2ff;border-radius:10px;font-size:20px}
+.item div:nth-child(2){flex:1}
+.item strong{font-size:13px}
+.item small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.status{background:#e6f7ed;color:#187849;padding:6px 8px;border-radius:20px;font-size:10px;white-space:nowrap}
+.btn{border:1px solid var(--line);background:white;padding:10px 13px;border-radius:8px;cursor:pointer;font-weight:bold;font-size:12px}
+.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.heading{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+input,select{padding:11px;border:1px solid var(--line);border-radius:8px;background:white;max-width:100%}
+input{flex:1;min-width:180px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td{text-align:left;padding:14px 10px;border-bottom:1px solid var(--line)}
+.table th{color:var(--muted);font-size:10px;text-transform:uppercase}
+.table-wrap{overflow:auto}
+.screen-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.screen{border:1px solid var(--line);border-radius:10px;padding:18px;cursor:pointer;background:white}
+.screen:hover{border-color:var(--blue)}
+.screen strong{font-size:13px}
+.screen p{font-size:11px;color:var(--muted)}
+.notice{background:#edf3ff;border-radius:9px;padding:15px;font-size:12px;line-height:1.6;color:#34518c;margin-top:18px}
+.page{display:none}.page.active{display:block}
+footer{text-align:center;color:#9aa4b5;font-size:10px;margin-top:25px}
+@media(max-width:950px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.screen-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){aside{width:65px;padding:15px 6px}.logo{font-size:0;padding:8px 0 25px;text-align:center}.logo:before{content:"4C";font-size:19px}.logo small,.section,.navtext{display:none}nav button{justify-content:center;padding:14px 3px;font-size:18px}.content{padding:20px 13px}header{padding:17px}.stats{gap:9px}.card{padding:13px}.number{font-size:24px}.screen-grid{grid-template-columns:1fr}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="logo">4Charge<small>PLAYER</small></div>
+  <div class="section">MENU PRINCIPAL</div>
+  <nav>
+    <button class="active" data-page="dashboard"><span>▦</span><span class="navtext">Dashboard</span></button>
+    <button data-page="parceiros"><span>♧</span><span class="navtext">Parceiros</span></button>
+    <button data-page="pontos"><span>⌖</span><span class="navtext">Pontos de anúncio</span></button>
+    <button data-page="anunciantes"><span>◎</span><span class="navtext">Anunciantes</span></button>
+    <button data-page="dispositivos"><span>▣</span><span class="navtext">Dispositivos</span></button>
+    <button data-page="midias"><span>▧</span><span class="navtext">Biblioteca de mídias</span></button>
+    <button data-page="grade"><span>☷</span><span class="navtext">Grade de anúncios</span></button>
+  </nav>
+</aside>
+<main>
+<header><span>4Charge Player / <b id="crumb">Dashboard</b></span><div class="avatar">4C</div></header>
+<div class="content">
+
+<section class="page active" id="dashboard">
+<div class="eyebrow">VISÃO GERAL DA OPERAÇÃO</div>
+<div class="heading"><h1>Dashboard</h1><button class="btn primary" onclick="go('dispositivos')">＋ Novo dispositivo</button></div>
+<p class="sub">Acompanhe sua rede de mídia digital em um só lugar.</p>
+<div class="stats">
+<div class="card"><label>Pontos de anúncio</label><div class="number">11</div><div class="hint">Locais cadastrados · exemplo</div></div>
+<div class="card"><label>Dispositivos</label><div class="number">14</div><div class="hint">Players da rede · exemplo</div></div>
+<div class="card"><label>Anunciantes</label><div class="number">40</div><div class="hint">Clientes cadastrados · exemplo</div></div>
+<div class="card"><label>Mídias</label><div class="number">86</div><div class="hint">Vídeos e imagens · exemplo</div></div>
+</div>
+<div class="grid">
+<div class="panel"><h3>Pontos de anúncio</h3><p class="desc">Resumo dos locais da rede</p>
+<div class="item"><div class="symbol">🏋️</div><div><strong>Usina do Corpo</strong><small>Gravataí · Academia</small></div><span class="status">Ativo</span></div>
+<div class="item"><div class="symbol">🍣</div><div><strong>Hokkaido Sushi</strong><small>Gravataí · Restaurante</small></div><span class="status">Ativo</span></div>
+<div class="item"><div class="symbol">🛒</div><div><strong>Mercado Arco-Íris</strong><small>Cachoeirinha · Mercado</small></div><span class="status">Ativo</span></div>
+<div class="item"><div class="symbol">🍕</div><div><strong>Pizzaria Marques</strong><small>Cachoeirinha · Restaurante</small></div><span class="status">Ativo</span></div>
+</div>
+<div class="panel"><h3>Atividade recente</h3><p class="desc">Exemplos de eventos do sistema</p>
+<div class="item"><div class="symbol">↻</div><div><strong>Grade atualizada</strong><small>Recepção — Usina do Corpo</small></div></div>
+<div class="item"><div class="symbol">▧</div><div><strong>Nova mídia cadastrada</strong><small>Campanha de primavera</small></div></div>
+<div class="item"><div class="symbol">▣</div><div><strong>Dispositivo sincronizado</strong><small>TV Box — Mercado Arco-Íris</small></div></div>
+<div class="notice">Esta primeira versão usa informações ilustrativas. Os dados reais serão conectados nas próximas etapas.</div>
+</div>
+</div>
+</section>
+
+<section class="page" id="parceiros">
+<div class="eyebrow">CADASTROS</div><div class="heading"><h1>Parceiros</h1><button class="btn primary" onclick="alert('O formulário funcional será implementado na próxima etapa.')">＋ Novo parceiro</button></div>
+<p class="sub">Gerencie empresas parceiras e seus dados de contato.</p>
+<div class="panel"><div class="toolbar"><input placeholder="Buscar razão social ou CNPJ"><button class="btn">Filtros</button></div><div class="table-wrap"><table class="table"><tr><th>Razão social</th><th>CNPJ</th><th>Representante</th><th>Status</th></tr><tr><td>Parceiro de exemplo</td><td>00.000.000/0001-00</td><td>Exemplo</td><td>Ativo</td></tr></table></div></div>
+</section>
+
+<section class="page" id="pontos">
+<div class="eyebrow">REDE DE EXIBIÇÃO</div><div class="heading"><h1>Pontos de anúncio</h1><button class="btn primary" onclick="alert('O formulário funcional será implementado na próxima etapa.')">＋ Novo ponto</button></div>
+<p class="sub">Gerencie os locais, as telas e as informações de cada ponto.</p>
+<div class="panel"><div class="toolbar"><input placeholder="Buscar ponto de anúncio"></div><div class="screen-grid">
+<div class="screen"><div class="symbol">🏋️</div><p><strong>Usina do Corpo</strong></p><p>Gravataí · Academia</p><span class="status">Ativo</span></div>
+<div class="screen"><div class="symbol">🍣</div><p><strong>Hokkaido Sushi</strong></p><p>Gravataí · Restaurante</p><span class="status">Ativo</span></div>
+<div class="screen"><div class="symbol">🛒</div><p><strong>Mercado Arco-Íris</strong></p><p>Cachoeirinha · Mercado</p><span class="status">Ativo</span></div>
+</div></div>
+</section>
+
+<section class="page" id="anunciantes">
+<div class="eyebrow">CLIENTES</div><div class="heading"><h1>Anunciantes</h1><button class="btn primary" onclick="alert('O formulário funcional será implementado na próxima etapa.')">＋ Novo anunciante</button></div>
+<p class="sub">Gerencie os anunciantes e os dados cadastrais.</p><div class="panel"><div class="toolbar"><input placeholder="Buscar empresa, CNPJ ou representante"></div><p class="sub">Os anunciantes cadastrados aparecerão aqui.</p></div>
+</section>
+
+<section class="page" id="dispositivos">
+<div class="eyebrow">PLAYERS DA REDE</div><div class="heading"><h1>Dispositivos</h1><button class="btn primary" onclick="alert('O formulário funcional será implementado na próxima etapa.')">＋ Novo dispositivo</button></div>
+<p class="sub">Gerencie TV Boxes e players associados às telas.</p><div class="panel"><div class="toolbar"><input placeholder="Buscar dispositivo ou UUID"></div><div class="table-wrap"><table class="table"><tr><th>Dispositivo</th><th>Tipo</th><th>Orientação</th><th>Ponto</th><th>Conexão</th></tr><tr><td>TV Box — Usina do Corpo</td><td>Android TV Box</td><td>Horizontal</td><td>Usina do Corpo</td><td><span class="status">Exemplo</span></td></tr></table></div></div>
+</section>
+
+<section class="page" id="midias">
+<div class="eyebrow">CONTEÚDO PUBLICITÁRIO</div><div class="heading"><h1>Biblioteca de mídias</h1><button class="btn primary" onclick="alert('O upload real será implementado na próxima etapa.')">＋ Nova mídia</button></div>
+<p class="sub">Organize vídeos e imagens para usar nas grades de anúncios.</p><div class="panel"><div class="toolbar"><input placeholder="Buscar mídia pelo nome"></div><div class="screen-grid"><div class="screen"><div class="symbol">🎬</div><p><strong>Campanha de primavera</strong></p><p>Vídeo · Vertical · 15 segundos</p></div><div class="screen"><div class="symbol">🖼️</div><p><strong>Oferta especial</strong></p><p>Imagem · Horizontal</p></div></div></div>
+</section>
+
+<section class="page" id="grade">
+<div class="eyebrow">PROGRAMAÇÃO DE CONTEÚDO</div><h1>Grade de anúncios</h1><p class="sub">Selecione uma tela para visualizar sua programação.</p>
+<div class="panel"><div class="toolbar"><input id="search" placeholder="Buscar pelo nome da tela"></div><div class="screen-grid" id="screens">
+<div class="screen" data-name="Recepção — Usina do Corpo" onclick="selectScreen(this)"><div class="symbol">▯</div><strong>Recepção — Usina do Corpo</strong><p>Vertical · 1080 × 1920</p></div>
+<div class="screen" data-name="Entrada — Hokkaido Sushi" onclick="selectScreen(this)"><div class="symbol">▰</div><strong>Entrada — Hokkaido Sushi</strong><p>Horizontal · 1920 × 1080</p></div>
+<div class="screen" data-name="Salão — Mercado Arco-Íris" onclick="selectScreen(this)"><div class="symbol">▯</div><strong>Salão — Mercado Arco-Íris</strong><p>Vertical · 1080 × 1920</p></div>
+</div><div id="chosen" class="notice" hidden></div></div>
+</section>
+<footer>4Charge Player · Protótipo visual · Dados ilustrativos</footer>
+</div>
+</main>
+</div>
+<script>
+const names={dashboard:"Dashboard",parceiros:"Parceiros",pontos:"Pontos de anúncio",anunciantes:"Anunciantes",dispositivos:"Dispositivos",midias:"Biblioteca de mídias",grade:"Grade de anúncios"};
+function go(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));document.getElementById("crumb").textContent=names[id];}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+document.getElementById("search").addEventListener("input",e=>{let q=e.target.value.toLowerCase();document.querySelectorAll("#screens .screen").forEach(s=>s.style.display=s.dataset.name.toLowerCase().includes(q)?"":"none")});
+function selectScreen(el){let box=document.getElementById("chosen");box.hidden=false;box.innerHTML="<strong>Tela selecionada:</strong> "+el.dataset.name+"<br><br>Na próxima etapa, vamos implementar aqui a lista de mídias compatíveis, a grade ativa, os controles para adicionar e remover anúncios, a ordenação e o botão Salvar.";}
+</script>
+</body>
+</html>
