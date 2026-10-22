@@ -62,7 +62,14 @@ input{flex:1;min-width:180px}
 .screen p{font-size:11px;color:var(--muted)}
 .notice{background:#edf3ff;border-radius:9px;padding:15px;font-size:12px;line-height:1.6;color:#34518c;margin-top:18px}
 .page{display:none}.page.active{display:block}
+.form-panel{margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.form-field label{font-size:12px;font-weight:bold;color:#536078}
+.form-field input{width:100%;min-width:0}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 footer{text-align:center;color:#9aa4b5;font-size:10px;margin-top:25px}
+@media(max-width:650px){.form-grid{grid-template-columns:1fr}}
 @media(max-width:950px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.screen-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){aside{width:65px;padding:15px 6px}.logo{font-size:0;padding:8px 0 25px;text-align:center}.logo:before{content:"4C";font-size:19px}.logo small,.section,.navtext{display:none}nav button{justify-content:center;padding:14px 3px;font-size:18px}.content{padding:20px 13px}header{padding:17px}.stats{gap:9px}.card{padding:13px}.number{font-size:24px}.screen-grid{grid-template-columns:1fr}h1{font-size:23px}}
 </style>
@@ -134,9 +141,24 @@ footer{text-align:center;color:#9aa4b5;font-size:10px;margin-top:25px}
 </section>
 
 <section class="page" id="parceiros">
-<div class="eyebrow">CADASTROS</div><div class="heading"><h1>Parceiros</h1><button class="btn primary" onclick="alert('O formulário funcional será implementado na próxima etapa.')">＋ Novo parceiro</button></div>
+<div class="eyebrow">CADASTROS</div><div class="heading"><h1>Parceiros</h1><button class="btn primary" id="new-partner-button" type="button" onclick="showPartnerForm()">＋ Novo parceiro</button></div>
 <p class="sub">Gerencie empresas parceiras e seus dados de contato.</p>
-<div class="panel"><div class="toolbar"><input placeholder="Buscar razão social ou CNPJ"><button class="btn">Filtros</button></div><div class="table-wrap"><table class="table"><tr><th>Razão social</th><th>CNPJ</th><th>Representante</th><th>Status</th></tr><tr><td>Parceiro de exemplo</td><td>00.000.000/0001-00</td><td>Exemplo</td><td>Ativo</td></tr></table></div></div>
+<div class="panel form-panel" id="partner-form-panel" hidden>
+  <h3 id="partner-form-title">Novo parceiro</h3>
+  <p class="desc">Preencha os dados da empresa parceira.</p>
+  <form id="partner-form">
+    <div class="form-grid">
+      <div class="form-field"><label for="partner-legal-name">Razão social *</label><input id="partner-legal-name" name="legalName" required autocomplete="organization" placeholder="Razão social da empresa"></div>
+      <div class="form-field"><label for="partner-cnpj">CNPJ *</label><input id="partner-cnpj" name="cnpj" required placeholder="00.000.000/0000-00" inputmode="numeric"></div>
+      <div class="form-field"><label for="partner-representative">Representante legal *</label><input id="partner-representative" name="representative" required placeholder="Nome completo"></div>
+      <div class="form-field"><label for="partner-phone">Telefone *</label><input id="partner-phone" name="phone" required type="tel" autocomplete="tel" placeholder="(51) 99999-9999"></div>
+      <div class="form-field"><label for="partner-cpf">CPF do representante *</label><input id="partner-cpf" name="cpf" required placeholder="000.000.000-00" inputmode="numeric"></div>
+      <div class="form-field"><label for="partner-email">E-mail *</label><input id="partner-email" name="email" required type="email" autocomplete="email" placeholder="contato@empresa.com.br"></div>
+    </div>
+    <div class="form-actions"><button class="btn" type="button" onclick="hidePartnerForm()">Cancelar</button><button class="btn primary" type="submit">Salvar parceiro</button></div>
+  </form>
+</div>
+<div class="panel"><div class="toolbar"><input id="partner-search" placeholder="Buscar razão social ou CNPJ" aria-label="Buscar parceiro por razão social ou CNPJ"></div><div class="table-wrap"><table class="table"><thead><tr><th>Razão social</th><th>CNPJ</th><th>Representante</th><th>Telefone</th><th>E-mail</th><th>Status</th></tr></thead><tbody id="partners-table-body"><tr data-example="true"><td>Parceiro de exemplo</td><td>00.000.000/0001-00</td><td>Exemplo</td><td>—</td><td>—</td><td><span class="status">Exemplo</span></td></tr></tbody></table></div><p class="hint" id="partners-empty" hidden>Nenhum parceiro encontrado.</p></div>
 </section>
 
 <section class="page" id="pontos">
@@ -198,6 +220,37 @@ document.querySelectorAll("nav .menu-toggle").forEach(b=>b.addEventListener("cli
   b.setAttribute("aria-expanded",String(opening));
 }));
 document.getElementById("search").addEventListener("input",e=>{let q=e.target.value.toLowerCase();document.querySelectorAll("#screens .screen").forEach(s=>s.style.display=s.dataset.name.toLowerCase().includes(q)?"":"none")});
+const partnerStorageKey="4charge-player-parceiros-v1";
+let registeredPartners=[];
+try{registeredPartners=JSON.parse(localStorage.getItem(partnerStorageKey)||"[]");if(!Array.isArray(registeredPartners))registeredPartners=[];}catch(e){registeredPartners=[];}
+function showPartnerForm(){document.getElementById("partner-form-panel").hidden=false;document.getElementById("partner-legal-name").focus();}
+function hidePartnerForm(){document.getElementById("partner-form-panel").hidden=true;document.getElementById("partner-form").reset();}
+function renderPartners(){
+  const tbody=document.getElementById("partners-table-body");
+  tbody.querySelectorAll("tr[data-saved-partner]").forEach(row=>row.remove());
+  registeredPartners.forEach((partner,index)=>{
+    const tr=document.createElement("tr");tr.dataset.savedPartner=String(index);
+    [partner.legalName,partner.cnpj,partner.representative,partner.phone,partner.email].forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.appendChild(td);});
+    const status=document.createElement("td");const badge=document.createElement("span");badge.className="status";badge.textContent="Ativo";status.appendChild(badge);tr.appendChild(status);tbody.appendChild(tr);
+  });
+  filterPartners();
+}
+function filterPartners(){
+  const query=document.getElementById("partner-search").value.trim().toLowerCase();let visible=0;
+  document.querySelectorAll("#partners-table-body tr").forEach(row=>{const matches=row.textContent.toLowerCase().includes(query);row.hidden=!matches;if(matches)visible++;});
+  document.getElementById("partners-empty").hidden=visible!==0;
+}
+document.getElementById("partner-search").addEventListener("input",filterPartners);
+document.getElementById("partner-form").addEventListener("submit",event=>{
+  event.preventDefault();const form=event.currentTarget;const data=new FormData(form);
+  const partner={legalName:String(data.get("legalName")).trim(),cnpj:String(data.get("cnpj")).trim(),representative:String(data.get("representative")).trim(),phone:String(data.get("phone")).trim(),cpf:String(data.get("cpf")).trim(),email:String(data.get("email")).trim()};
+  const normalizedCnpj=partner.cnpj.replace(/\D/g,"");
+  if(registeredPartners.some(item=>item.cnpj.replace(/\D/g,"")===normalizedCnpj)){alert("Já existe um parceiro cadastrado com esse CNPJ.");return;}
+  registeredPartners.push(partner);
+  try{localStorage.setItem(partnerStorageKey,JSON.stringify(registeredPartners));}catch(error){registeredPartners.pop();alert("Não foi possível salvar neste navegador. Verifique o espaço disponível ou as configurações de privacidade.");return;}
+  renderPartners();hidePartnerForm();
+});
+renderPartners();
 function selectScreen(el){let box=document.getElementById("chosen");box.hidden=false;box.innerHTML="<strong>Tela selecionada:</strong> "+el.dataset.name+"<br><br>Na próxima etapa, vamos implementar aqui a lista de mídias compatíveis, a grade ativa, os controles para adicionar e remover anúncios, a ordenação e o botão Salvar.";}
 </script>
 </body>
